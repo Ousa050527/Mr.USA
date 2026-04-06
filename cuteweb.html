@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Will You Be Mine?</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #ffdeeb; /* ពណ៌ផ្កាឈូកខ្ចី */
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 400px;
+            z-index: 1;
+        }
+
+        h1 {
+            font-family: Khmer OS Muol Light;
+            color: #930ed1;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 12px 25px;
+            font-size: 18px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        #yesBtn {
+            font-family: Times New Roman,Khmer OS Muol Light;
+            background-color: #8517df;
+            color: white;
+        }
+
+        #noBtn {
+            font-family: Times New Roman,Khmer OS Muol Light;
+            background-color: #8517df;
+            color: #e9e7e7;
+            position: relative;
+        }
+
+        img {
+            width: 150px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <img src="gift.gif" alt="Cute gif" id="mainImage">
+        
+        <h1 id="question">តើអូនព្រមធ្វើជាសង្សារបងទេ? ម្ខាស់ចិត្ត 😘❤️</h1>
+        
+        <div class="buttons">
+            <button id="yesBtn">ព្រម</button>
+            <button id="noBtn">មិនព្រម (មិចបានមិនព្រម)</button>
+        </div>
+    </div>
+
+    <script>
+        const noBtn = document.getElementById('noBtn');
+        const yesBtn = document.getElementById('yesBtn');
+        const question = document.getElementById('question');
+
+        // នៅពេលចុចលើប៊ូតុង Yes
+        yesBtn.addEventListener('click', () => {
+            question.innerHTML = "យេ! ស្រឡាញ់គ្នាហើយណា! 🥰";
+            document.querySelector('.buttons').style.display = 'none';
+        });
+
+        // ធ្វើឱ្យប៊ូតុង No រត់ចេញ និងប៊ូតុង Yes រីកធំ
+        noBtn.addEventListener('mouseover', moveButton);
+        noBtn.addEventListener('click', moveButton);
+
+        function moveButton() {
+            // គណនាទីតាំងថ្មីឱ្យប៊ូតុង No រត់
+            const x = Math.random() * (window.innerWidth - noBtn.offsetWidth);
+            const y = Math.random() * (window.innerHeight - noBtn.offsetHeight);
+            
+            noBtn.style.position = 'absolute';
+            noBtn.style.left = x + 'px';
+            noBtn.style.top = y + 'px';
+
+            // ធ្វើឱ្យប៊ូតុង Yes រីកធំបន្តិចម្តងៗ
+            let currentFontSize = parseFloat(window.getComputedStyle(yesBtn).fontSize);
+            yesBtn.style.fontSize = (currentFontSize + 5) + 'px';
+            yesBtn.style.padding = (currentFontSize * 0.8) + 'px';
+            
+        }
+        const mainImage = document.getElementById('mainImage');
+
+yesBtn.addEventListener('click', () => {
+    question.innerHTML = "យេ! ស្រឡាញ់គ្នាហើយណា! 🥰";
+    
+    // ប្ដូររូបភាពត្រង់នេះ
+    mainImage.src = "ye.jpg"; 
+
+    document.querySelector('.buttons').style.display = 'none';
+});
+    </script>
+
+</body>
+</html>
