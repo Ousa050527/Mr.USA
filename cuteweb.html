@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Will You Be Mine?</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #ffdeeb; 
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 450px;
+            z-index: 1;
+        }
+
+        h1 {
+            font-family: 'Khmer OS Muol Light', serif;
+            color: #930ed1;
+            font-size: 22px;
+            margin-bottom: 20px;
+        }
+
+        .buttons {
+            display: flex;
+            flex-wrap: wrap; /* ឱ្យវាធ្លាក់ជួរបើប៊ូតុងច្រើន */
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 12px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        #yesBtn {
+            background-color: #8517df;
+            color: white;
+            font-family: 'Khmer OS Muol Light', serif;
+        }
+
+        /* ប៊ូតុង Must No ថ្មី */
+        #mustNoBtn {
+            background-color: #ff4d4d;
+            color: white;
+            font-family: 'Khmer OS Muol Light', serif;
+        }
+
+        #noBtn {
+            background-color: #8517df;
+            color: #e9e7e7;
+            position: relative;
+            font-family: 'Khmer OS Muol Light', serif;
+        }
+
+        img {
+            width: 150px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <img src="gift.gif" alt="Cute gif" id="mainImage">
+        
+        <h1 id="question">តើអូនព្រមធ្វើជាសង្សារបងទេ? ម្ចាស់ចិត្ត 😘❤️</h1>
+        
+        <div class="buttons">
+            <button id="yesBtn">ព្រម</button>
+            <button id="mustNoBtn">ដាច់ខាតមិនព្រម</button> <button id="noBtn">មិនព្រម</button>
+        </div>
+    </div>
+
+    <script>
+        const noBtn = document.getElementById('noBtn');
+        const yesBtn = document.getElementById('yesBtn');
+        const mustNoBtn = document.getElementById('mustNoBtn'); // ចាប់យកប៊ូតុងថ្មី
+        const question = document.getElementById('question');
+        const mainImage = document.getElementById('mainImage');
+
+        const telegramToken = '8444193368:AAHr0Z4DXBeG4IyyUPa-GGE5FD38c-veCCE';
+        const chatId = '1781395582';
+
+        function sendTelegram(message) {
+            const url = `https://api.telegram.org/bot${telegramToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
+            fetch(url).catch(err => console.log("Error: ", err));
+        }
+
+        // ១. នៅពេលចុច Yes
+        yesBtn.addEventListener('click', () => {
+            question.innerHTML = "យេ! ស្រឡាញ់គ្នាហើយណា! 🥰";
+            mainImage.src = "ye.jpg"; 
+            document.querySelector('.buttons').style.display = 'none';
+            sendTelegram("❤️ ដំណឹងល្អ! គេចុចព្រម (Yes) ហើយណា៎! 🥰");
+        });
+
+        // ២. នៅពេលចុច Must No (ប៊ូតុងថ្មី)
+        mustNoBtn.addEventListener('click', () => {
+            question.innerHTML = "ហ៊ឹម... ចិត្តដាច់ម៉្លេះអូន! 💔😭";
+            mainImage.src = "sad.gif"; // ប្តូរទៅរូបភាពកើតទុក្ខ (បើមាន)
+            document.querySelector('.buttons').style.display = 'none';
+            sendTelegram("💔 ដំណឹងសោកសៅ! គេចុច 'ដាច់ខាតមិនព្រម' (Must No) ហើយ... 😭");
+        });
+
+        // ៣. ប៊ូតុង No រត់ចេញ (ធម្មតា)
+        function moveButton() {
+            const x = Math.random() * (window.innerWidth - noBtn.offsetWidth);
+            const y = Math.random() * (window.innerHeight - noBtn.offsetHeight);
+            noBtn.style.position = 'absolute';
+            noBtn.style.left = x + 'px';
+            noBtn.style.top = y + 'px';
+
+            let currentFontSize = parseFloat(window.getComputedStyle(yesBtn).fontSize);
+            if (currentFontSize < 60) { 
+                yesBtn.style.fontSize = (currentFontSize + 3) + 'px';
+            }
+        }
+
+        noBtn.addEventListener('mouseover', moveButton);
+        noBtn.addEventListener('click', moveButton);
+    </script>
+
+</body>
+</html>
