@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clear Section Wheel</title>
+    <style>
+        body { margin: 0; height: 100vh; display: flex; justify-content: center; align-items: center; background-color: #ffdeeb; font-family: 'Arial', sans-serif; }
+        .container { text-align: center; background: white; padding: 30px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 450px; position: relative; }
+        
+        /* តំបន់កង់បង្វិល */
+        .wheel-box { position: relative; width: 340px; height: 340px; margin: 0 auto 20px; }
+        canvas { 
+            width: 100%; height: 100%; border-radius: 50%; 
+            border: 8px solid #333; /* ព្រំពណ៌ខ្មៅឱ្យលេចធ្លោ */
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        /* ទ្រនិចចង្អុល */
+        .arrow {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0; 
+            height: 0; 
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 40px solid #ff4d8d;
+            z-index: 10;
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2));
+        }
+
+        textarea { width: 100%; height: 80px; border-radius: 10px; border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; resize: none; font-size: 14px; }
+        #result { font-size: 20px; font-weight: bold; color: #333; margin: 15px 0; min-height: 35px; }
+        
+        .btn-spin {
+            background: linear-gradient(45deg, #ab18cf, #ff4d8d);
+            color: white; padding: 15px 30px; border: none; border-radius: 50px;
+            font-size: 18px; cursor: pointer; font-weight: bold; width: 100%;
+            box-shadow: 0 5px 15px rgba(214, 51, 132, 0.4);
+        }
+        .btn-spin:disabled { background: #ccc; box-shadow: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="wheel-box">
+        <div class="arrow"></div>
+        <canvas id="wheelCanvas" width="500" height="500"></canvas>
+    </div>
+
+    <textarea id="nameList" placeholder="បញ្ចូលឈ្មោះម្នាក់មួយបន្ទាត់...">lok&#10;Mrs.k&#10;hsf</textarea>
+    <div id="result">សូមចុចប៊ូតុងដើម្បីជ្រើសរើស</div>
+    <button class="btn-spin" id="spinBtn" onclick="spinWheel()">ចាប់ផ្ដើមបង្វិល</button>
+</div>
+
+<script>
+    const canvas = document.getElementById('wheelCanvas');
+    const ctx = canvas.getContext('2d');
+    const nameInput = document.getElementById('nameList');
+    const resultDiv = document.getElementById('result');
+    const spinBtn = document.getElementById('spinBtn');
+
+    // បញ្ជីពណ៌ដែលបែងចែកច្បាស់ៗ
+    const colors = ["#ab18cf", "#f8f9fa", "#ff4d8d", "#333333", "#00d1b2", "#ffdd57"];
+    let names = [];
+    let startAngle = 0;
+    let arc = 0;
+    let spinTimeout = null;
+    let spinAngleStart = 10;
+    let spinTime = 0;
+    let spinTimeTotal = 0;
+
+    function drawWheel() {
+        names = nameInput.value.split('\n').filter(n => n.trim() !== "");
+        const numOptions = names.length;
+        if (numOptions === 0) { ctx.clearRect(0, 0, 500, 500); return; }
+
+        arc = Math.PI / (numOptions / 2);
+        ctx.clearRect(0, 0, 500, 500);
+
+        for (let i = 0; i < numOptions; i++) {
+            const angle = startAngle + i * arc;
+            
+            // ១. គូរផ្ទៃពណ៌នៃផ្នែកនីមួយៗ
+            ctx.fillStyle = colors[i % colors.length];
+            ctx.beginPath();
+            ctx.moveTo(250, 250);
+            ctx.arc(250, 250, 245, angle, angle + arc, false);
+            ctx.lineTo(250, 250);
+            ctx.fill();
+
+            // ២. គូរបន្ទាត់ខណ្ឌចែកផ្នែក (Border line) ឱ្យដាច់ពីគ្នាខ្លាំង
+            ctx.strokeStyle = "#ffffff"; // បន្ទាត់ពណ៌ស
+            ctx.lineWidth = 4;           // កម្រាស់បន្ទាត់
+            ctx.stroke();
+
+            // ៣. សរសេរឈ្មោះ
+            ctx.save();
+            // ប្តូរពណ៌អក្សរតាមពណ៌ផ្ទៃខាងក្រោយ
+            ctx.fillStyle = (colors[i % colors.length] === "#f8f9fa" || colors[i % colors.length] === "#ffdd57") ? "#333" : "#fff";
+            ctx.translate(250 + Math.cos(angle + arc / 2) * 160, 250 + Math.sin(angle + arc / 2) * 160);
+            ctx.rotate(angle + arc / 2 + Math.PI / 2);
+            ctx.font = 'bold 22px Arial';
+            ctx.fillText(names[i], -ctx.measureText(names[i]).width / 2, 0);
+            ctx.restore();
+        }
+
+        // គូររង្វង់កណ្តាលដើម្បីបិទចំណុចប្រសព្វបន្ទាត់
+        ctx.fillStyle = "#333";
+        ctx.beginPath();
+        ctx.arc(250, 250, 15, 0, 2 * Math.PI);
+        ctx.fill();
+    }
+
+    nameInput.addEventListener('input', drawWheel);
+    drawWheel();
+
+    function spinWheel() {
+        if (names.length === 0) return;
+        spinBtn.disabled = true;
+        resultDiv.innerText = "កំពុងជ្រើសរើស...";
+        spinAngleStart = Math.random() * 10 + 15;
+        spinTime = 0;
+        spinTimeTotal = Math.random() * 3000 + 4000;
+        rotateWheel();
+    }
+
+    function rotateWheel() {
+        spinTime += 30;
+        if (spinTime >= spinTimeTotal) { stopRotateWheel(); return; }
+        const spinAngle = spinAngleStart - easeOut(spinTime, 0, spinAngleStart, spinTimeTotal);
+        startAngle += (spinAngle * Math.PI / 180);
+        drawWheel();
+        spinTimeout = setTimeout(rotateWheel, 30);
+    }
+
+    function stopRotateWheel() {
+        clearTimeout(spinTimeout);
+        const degrees = startAngle * 180 / Math.PI + 90;
+        const arcd = arc * 180 / Math.PI;
+        const index = Math.floor((360 - degrees % 360) / arcd);
+        const winner = names[index];
+        
+        resultDiv.innerHTML = "✨ អ្នកដែលត្រូវជ្រើសរើសគឺ៖ <span style='color: #ff4d8d;'>" + winner + "</span> ✨";
+        
+        // លុបឈ្មោះចេញក្រោយ ១.៥ វិនាទី
+        setTimeout(() => {
+            names.splice(index, 1);
+            nameInput.value = names.join('\n');
+            drawWheel();
+            spinBtn.disabled = false;
+        }, 1500);
+    }
+
+    function easeOut(t, b, c, d) {
+        const ts = (t /= d) * t;
+        const tc = ts * t;
+        return b + c * (tc + -3 * ts + 3 * t);
+    }
+</script>
+
+</body>
+</html>
